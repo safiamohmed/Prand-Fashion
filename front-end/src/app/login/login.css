@@ -1,0 +1,175 @@
+/* login.css */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-header {
+  margin-bottom: 30px;
+}
+
+.login-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+}
+
+.login-subtitle {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.login-form {
+  margin-bottom: 25px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-label {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.options-list {
+  margin: 25px 0;
+  text-align: left;
+}
+
+.option-item {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+.login-btn {
+  width: 100%;
+  background: #333;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background: #555;
+}
+
+.divider {
+  position: relative;
+  margin: 25px 0;
+  text-align: center;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+}
+
+.divider-text {
+  background: white;
+  padding: 0 15px;
+  color: #666;
+  font-size: 14px;
+}
+/* login.css - إضافة الـ Sign Up Link */
+.signup-link {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.signup-link p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.signup-text {
+  color: #23856D;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-text:hover {
+  text-decoration: underline;
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.social-btn {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.social-btn:hover {
+  background: #f9f9f9;
+}
+
+.google-btn {
+  color: #333;
+}
+
+.facebook-btn {
+  color: #1877f2;
+}

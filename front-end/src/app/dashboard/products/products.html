@@ -1,0 +1,296 @@
+<div class="products-container">
+  <!-- Header -->
+  <div class="products-header">
+    <h2>Products Management</h2>
+    <div class="header-actions">
+      <button class="add-product-btn" (click)="toggleProductForm()">
+        {{ showProductForm ? 'Cancel' : 'Add Product' }}
+      </button>
+      <button class="refresh-btn" (click)="loadProducts()" [disabled]="isLoading">
+        {{ isLoading ? 'Loading...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  @if(successMessage) {
+    <div class="alert alert-success">
+      {{ successMessage }}
+    </div>
+  }
+
+  @if(errorMessage) {
+    <div class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Add/Edit Product Form -->
+  @if(showProductForm) {
+    <div class="form-container">
+      <!-- تحديث عنوان النموذج -->
+      <h3>{{ getFormTitle() }}</h3>
+      <form [formGroup]="productForm" (ngSubmit)="submitProduct()">
+        <!-- Product Info -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productName">Product Name *</label>
+            <input
+              type="text"
+              id="productName"
+              formControlName="name"
+              placeholder="Enter product name"
+              [class.invalid]="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+            >
+            @if(productForm.get('name')?.invalid && productForm.get('name')?.touched) {
+              <div class="error-message">
+                Name is required (min 3 characters)
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="productSlug">Slug *</label>
+            <input
+              type="text"
+              id="productSlug"
+              formControlName="slug"
+              placeholder="Enter slug (e.g., apple-iphone-15)"
+              [class.invalid]="productForm.get('slug')?.invalid && productForm.get('slug')?.touched"
+            >
+            @if(productForm.get('slug')?.invalid && productForm.get('slug')?.touched) {
+              <div class="error-message">
+                Slug is required and must contain only lowercase letters, numbers, and hyphens
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productPrice">Price ($) *</label>
+            <input
+              type="number"
+              id="productPrice"
+              formControlName="price"
+              placeholder="Enter price"
+              min="0"
+              step="0.01"
+              [class.invalid]="productForm.get('price')?.invalid && productForm.get('price')?.touched"
+            >
+            @if(productForm.get('price')?.invalid && productForm.get('price')?.touched) {
+              <div class="error-message">
+                Price is required and must be positive
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="productStock">Stock *</label>
+            <input
+              type="number"
+              id="productStock"
+              formControlName="stock"
+              placeholder="Enter stock quantity"
+              min="0"
+              [class.invalid]="productForm.get('stock')?.invalid && productForm.get('stock')?.touched"
+            >
+            @if(productForm.get('stock')?.invalid && productForm.get('stock')?.touched) {
+              <div class="error-message">
+                Stock is required and must be positive
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="productDesc">Description *</label>
+          <textarea
+            id="productDesc"
+            formControlName="desc"
+            placeholder="Enter product description"
+            rows="3"
+            [class.invalid]="productForm.get('desc')?.invalid && productForm.get('desc')?.touched"
+          ></textarea>
+          @if(productForm.get('desc')?.invalid && productForm.get('desc')?.touched) {
+            <div class="error-message">
+              Description is required (min 10 characters)
+            </div>
+          }
+        </div>
+
+        <!-- Categories -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productCategory">Category *</label>
+            <select
+              id="productCategory"
+              formControlName="category"
+              (change)="onCategoryChange(productForm.get('category')?.value)"
+            >
+              <option value="">Select Category</option>
+              @for(category of categories; track category._id) {
+                <option [value]="category._id">{{ category.name }}</option>
+              }
+            </select>
+            @if(productForm.get('category')?.invalid && productForm.get('category')?.touched) {
+              <div class="error-message">
+                Category is required
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="productSubCategory">Sub-Category</label>
+            <select
+              id="productSubCategory"
+              formControlName="subCategory"
+              [disabled]="!selectedCategoryId"
+            >
+              <option value="">Select Sub-Category (Optional)</option>
+              @for(subCategory of filteredSubCategories; track subCategory._id) {
+                <option [value]="subCategory._id">{{ subCategory.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- أضف عرض الصورة الحالية في وضع التحرير -->
+        @if(isEditMode && currentProduct) {
+          <div class="current-image-section">
+            <h4>Current Image:</h4>
+            @if(currentProduct.imgURL) {
+              <img
+                [src]="staticURL + '/' + currentProduct.imgURL"
+                alt="Current product image"
+                class="current-image-preview"
+              >
+            } @else {
+              <div class="no-image-message">No image uploaded</div>
+            }
+            <p class="image-hint">
+              Upload new image only if you want to replace the current one.
+            </p>
+          </div>
+        }
+
+        <!-- تحديث تسمية حقل الصورة -->
+        <div class="form-group">
+          <label for="productImage">
+            Product Image
+            @if(!isEditMode) {
+              <span>*</span>
+            }
+          </label>
+          <div class="file-upload">
+            <input
+              type="file"
+              id="productImage"
+              accept="image/jpeg,image/png,image/jpg"
+              (change)="onFileSelected($event)"
+            >
+            <div class="file-info">
+              @if(selectedFile) {
+                <span>{{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} KB)</span>
+              } @else {
+                <span>
+                  @if(isEditMode) {
+                    Click to change image (optional)
+                  } @else {
+                    Click to upload image (Max 2MB, JPEG/PNG only)
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            [disabled]="productForm.invalid || (!isEditMode && !selectedFile) || isLoading"
+          >
+            {{ getSubmitButtonText() }}
+          </button>
+          <button type="button" (click)="toggleProductForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Products Table -->
+  <div class="products-table-container">
+    <h3>All Products ({{ products.length }})</h3>
+
+    @if(isLoading) {
+      <div class="loading">Loading products...</div>
+    } @else {
+      <div class="table-responsive">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Category</th>
+              <th>Sub-Category</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(product of products; track product._id) {
+              <tr>
+                <td>
+                  @if(product.imgURL) {
+                    <img
+                      [src]="staticURL + '/' + product.imgURL"
+                      alt="{{product.name}}"
+                      class="product-thumbnail"
+                    >
+                  } @else {
+                    <div class="no-image">No Image</div>
+                  }
+                </td>
+                <td>
+                  <div class="product-name">{{ product.name }}</div>
+                  <div class="product-slug">{{ product.slug }}</div>
+                </td>
+                <td>${{ product.price }}</td>
+                <td>
+                  <span [class.low-stock]="product.stock < 10">
+                    {{ product.stock }}
+                  </span>
+                </td>
+                <td>{{ getCategoryName(product.category) }}</td>
+                <td>{{ getSubCategoryName(product.subCategory) }}</td>
+                <td>
+                  <!-- تحديث زر Edit في الجدول -->
+                  <div class="action-buttons">
+                    <button class="edit-btn" (click)="toggleProductForm(product)">
+                      Edit
+                    </button>
+                    <button class="delete-btn" (click)="deleteProduct(product._id!)">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if(products.length === 0) {
+              <tr>
+                <td colspan="7" class="no-data">
+                  <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h4>No products found</h4>
+                    <p>Click "Add Product" to create your first product</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

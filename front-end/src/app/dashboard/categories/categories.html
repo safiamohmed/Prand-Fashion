@@ -1,0 +1,325 @@
+<!-- dashboard/categories/categories.html -->
+<div class="categories-container">
+  <!-- Header -->
+  <div class="categories-header">
+    <h2>Categories Management</h2>
+    <div class="header-actions">
+      <button class="add-category-btn" (click)="toggleCategoryForm()">
+        {{ showCategoryForm ? 'Cancel' : 'Add Category' }}
+      </button>
+      <button class="add-subcategory-btn" (click)="toggleSubCategoryForm()">
+        {{ showSubCategoryForm ? 'Cancel' : 'Add Sub-Category' }}
+      </button>
+      <button class="refresh-btn" (click)="loadData()" [disabled]="isLoadingCategories || isLoadingSubCategories">
+        {{ (isLoadingCategories || isLoadingSubCategories) ? 'Loading...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  @if(successMessage) {
+    <div class="alert alert-success">
+      {{ successMessage }}
+      <button class="alert-close" (click)="successMessage = ''">×</button>
+    </div>
+  }
+
+  @if(errorMessage) {
+    <div class="alert alert-error">
+      {{ errorMessage }}
+      <button class="alert-close" (click)="errorMessage = ''">×</button>
+    </div>
+  }
+
+  <!-- Add Category Form -->
+  @if(showCategoryForm) {
+    <div class="form-container">
+      <h3>Add New Category</h3>
+      <form [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
+        <div class="form-group">
+          <label for="categoryName">Category Name</label>
+          <input
+            type="text"
+            id="categoryName"
+            formControlName="name"
+            placeholder="Enter category name"
+            [class.invalid]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+          >
+          @if(categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+            <div class="error-message">
+              Name is required and must be at least 2 characters
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="categorySlug">Slug</label>
+          <input
+            type="text"
+            id="categorySlug"
+            formControlName="slug"
+            placeholder="Enter slug (e.g., electronics)"
+            [class.invalid]="categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched"
+          >
+          @if(categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched) {
+            <div class="error-message">
+              Slug is required and must contain only lowercase letters, numbers, and hyphens
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="categoryForm.invalid || isLoading">
+            {{ isLoading ? 'Creating...' : 'Create Category' }}
+          </button>
+          <button type="button" (click)="toggleCategoryForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Add Sub-Category Form -->
+  @if(showSubCategoryForm) {
+    <div class="form-container">
+      <h3>Add New Sub-Category</h3>
+      <form [formGroup]="subCategoryForm" (ngSubmit)="submitSubCategory()">
+        <div class="form-group">
+          <label for="subCategoryName">Sub-Category Name</label>
+          <input
+            type="text"
+            id="subCategoryName"
+            formControlName="name"
+            placeholder="Enter sub-category name"
+            [class.invalid]="subCategoryForm.get('name')?.invalid && subCategoryForm.get('name')?.touched"
+          >
+          @if(subCategoryForm.get('name')?.invalid && subCategoryForm.get('name')?.touched) {
+            <div class="error-message">
+              Name is required and must be at least 2 characters
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="subCategorySlug">Slug</label>
+          <input
+            type="text"
+            id="subCategorySlug"
+            formControlName="slug"
+            placeholder="Enter slug (e.g., smartphones)"
+            [class.invalid]="subCategoryForm.get('slug')?.invalid && subCategoryForm.get('slug')?.touched"
+          >
+          @if(subCategoryForm.get('slug')?.invalid && subCategoryForm.get('slug')?.touched) {
+            <div class="error-message">
+              Slug is required and must contain only lowercase letters, numbers, and hyphens
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="parentCategory">Parent Category</label>
+          <select id="parentCategory" formControlName="parent">
+            <option value="">Select Parent Category (Optional)</option>
+            @for(category of categories; track category._id) {
+              <option [value]="category._id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="subCategoryForm.invalid || isLoading">
+            {{ isLoading ? 'Creating...' : 'Create Sub-Category' }}
+          </button>
+          <button type="button" (click)="toggleSubCategoryForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Edit Category Form -->
+  @if(showEditCategoryForm && selectedCategory) {
+    <div class="form-container edit-form">
+      <h3>Edit Category</h3>
+      <form [formGroup]="editCategoryForm" (ngSubmit)="updateCategory()">
+        <div class="form-group">
+          <label for="editCategoryName">Category Name</label>
+          <input
+            type="text"
+            id="editCategoryName"
+            formControlName="name"
+            placeholder="Enter category name"
+            [class.invalid]="editCategoryForm.get('name')?.invalid && editCategoryForm.get('name')?.touched"
+          >
+          @if(editCategoryForm.get('name')?.invalid && editCategoryForm.get('name')?.touched) {
+            <div class="error-message">
+              Name is required and must be at least 2 characters
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="editCategorySlug">Slug</label>
+          <input
+            type="text"
+            id="editCategorySlug"
+            formControlName="slug"
+            placeholder="Enter slug (e.g., electronics)"
+            [class.invalid]="editCategoryForm.get('slug')?.invalid && editCategoryForm.get('slug')?.touched"
+          >
+          @if(editCategoryForm.get('slug')?.invalid && editCategoryForm.get('slug')?.touched) {
+            <div class="error-message">
+              Slug is required and must contain only lowercase letters, numbers, and hyphens
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="editCategoryForm.invalid || isLoading">
+            {{ isLoading ? 'Updating...' : 'Update Category' }}
+          </button>
+          <button type="button" (click)="cancelEditCategory()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Edit Sub-Category Form -->
+  @if(showEditSubCategoryForm && selectedSubCategory) {
+    <div class="form-container edit-form">
+      <h3>Edit Sub-Category</h3>
+      <form [formGroup]="editSubCategoryForm" (ngSubmit)="updateSubCategory()">
+        <div class="form-group">
+          <label for="editSubCategoryName">Sub-Category Name</label>
+          <input
+            type="text"
+            id="editSubCategoryName"
+            formControlName="name"
+            placeholder="Enter sub-category name"
+            [class.invalid]="editSubCategoryForm.get('name')?.invalid && editSubCategoryForm.get('name')?.touched"
+          >
+          @if(editSubCategoryForm.get('name')?.invalid && editSubCategoryForm.get('name')?.touched) {
+            <div class="error-message">
+              Name is required and must be at least 2 characters
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="editSubCategorySlug">Slug</label>
+          <input
+            type="text"
+            id="editSubCategorySlug"
+            formControlName="slug"
+            placeholder="Enter slug (e.g., smartphones)"
+            [class.invalid]="editSubCategoryForm.get('slug')?.invalid && editSubCategoryForm.get('slug')?.touched"
+          >
+          @if(editSubCategoryForm.get('slug')?.invalid && editSubCategoryForm.get('slug')?.touched) {
+            <div class="error-message">
+              Slug is required and must contain only lowercase letters, numbers, and hyphens
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="editParentCategory">Parent Category</label>
+          <select id="editParentCategory" formControlName="parent">
+            <option value="">Select Parent Category (Optional)</option>
+            @for(category of categories; track category._id) {
+              <option [value]="category._id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="editSubCategoryForm.invalid || isLoading">
+            {{ isLoading ? 'Updating...' : 'Update Sub-Category' }}
+          </button>
+          <button type="button" (click)="cancelEditSubCategory()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Categories Table -->
+  <div class="categories-table-container">
+    <h3>Categories ({{ categories.length }})</h3>
+    @if(isLoadingCategories) {
+      <div class="loading">Loading categories...</div>
+    } @else {
+      <div class="table-responsive">
+        <table class="categories-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(category of categories; track category._id) {
+              <tr>
+                <td>{{ category.name }}</td>
+                <td>{{ category.slug }}</td>
+                <td>{{ category.createdAt | date:'shortDate' }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="edit-btn" (click)="openEditCategory(category)" [disabled]="isLoading">Edit</button>
+                    <button class="delete-btn" (click)="deleteCategory(category._id)" [disabled]="isLoading">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if(categories.length === 0) {
+              <tr>
+                <td colspan="4" class="no-data">No categories found</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <!-- Sub-Categories Table -->
+  <div class="subcategories-table-container">
+    <h3>Sub-Categories ({{ subCategories.length }})</h3>
+    @if(isLoadingSubCategories) {
+      <div class="loading">Loading sub-categories...</div>
+    } @else {
+      <div class="table-responsive">
+        <table class="subcategories-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Parent Category</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(subCategory of subCategories; track subCategory._id) {
+              <tr>
+                <td>{{ subCategory.name }}</td>
+                <td>{{ subCategory.slug }}</td>
+                <td>{{ getParentCategoryName(subCategory.parent) }}</td>
+                <td>{{ subCategory.createdAt | date:'shortDate' }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="edit-btn" (click)="openEditSubCategory(subCategory)" [disabled]="isLoading">Edit</button>
+                    <button class="delete-btn" (click)="deleteSubCategory(subCategory._id)" [disabled]="isLoading">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if(subCategories.length === 0) {
+              <tr>
+                <td colspan="5" class="no-data">No sub-categories found</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

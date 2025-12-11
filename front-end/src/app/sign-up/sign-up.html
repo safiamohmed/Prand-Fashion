@@ -1,0 +1,81 @@
+<!-- signup.component.html -->
+<div class="signup-container">
+  <div class="signup-card">
+    <!-- Header Section -->
+    <div class="signup-header">
+      <h1 class="signup-title">SIGN UP</h1>
+      <p class="signup-subtitle">Join our fashion community and discover the latest trends</p>
+    </div>
+
+    <!-- Signup Form -->
+    <form [formGroup]="signupForm" (ngSubmit)="signup()" class="signup-form">
+      <!-- Name Input -->
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input
+          formControlName="name"
+          type="text"
+          class="form-input"
+          placeholder="Enter your full name">
+        <div *ngIf="signupForm.get('name')?.invalid && signupForm.get('name')?.touched" class="error-message">
+          Name is required
+        </div>
+      </div>
+
+      <!-- Email Input -->
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input
+          formControlName="email"
+          type="email"
+          class="form-input"
+          placeholder="Enter your email">
+        <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="error-message">
+          Valid email is required
+        </div>
+      </div>
+
+      <!-- Password Input -->
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input
+          formControlName="password"
+          type="password"
+          class="form-input"
+          placeholder="Enter your password">
+        <div *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched" class="error-message">
+          Password must be at least 6 characters
+        </div>
+      </div>
+
+      <!-- Confirm Password Input -->
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input
+          formControlName="confirmPassword"
+          type="password"
+          class="form-input"
+          placeholder="Confirm your password">
+        <div *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched" class="error-message">
+          Please confirm your password
+        </div>
+      </div>
+
+     
+
+
+      <!-- Submit Button -->
+      <button type="submit" class="signup-button" [disabled]="signupForm.invalid">
+        CREATE ACCOUNT
+      </button>
+    </form>
+
+
+
+
+    <!-- Login Link -->
+    <div class="login-link">
+      <p>Already have an account? <a routerLink="/login" class="link">Login here</a></p>
+    </div>
+  </div>
+</div>

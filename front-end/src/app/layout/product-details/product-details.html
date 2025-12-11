@@ -1,0 +1,165 @@
+<!-- layout/product-details/product-details.html -->
+@if(product) {
+<div class="product-details-page">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a routerLink="/home">Home</a>
+    <span>›</span>
+    <a routerLink="/products">Products</a>
+    <span>›</span>
+    <span>{{ product.name }}</span>
+  </div>
+
+  <div class="product-details-container">
+    <!-- Product Images -->
+    <div class="product-images">
+      <div class="main-image">
+        <img
+          [src]="staticURL + '/' + product.imgURL"
+          [alt]="product.name"
+          (error)="onImageError($event)"
+        />
+      </div>
+      <div class="image-thumbnails">
+        @for(image of images; track $index) {
+          <div
+            class="thumbnail"
+            [class.active]="selectedImageIndex === $index"
+            (click)="selectImage($index)"
+          >
+            <img
+              [src]="staticURL + '/' + image"
+              [alt]="product.name + ' thumbnail'"
+              (error)="onImageError($event)"
+            >
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="product-info">
+      <h1 class="product-name">{{ product.name }}</h1>
+
+      <div class="product-meta">
+        <span class="product-id">SKU: {{ product._id?.slice(0, 8) }}</span>
+        <span class="product-stock" [class]="getStockClass()">
+          {{ getStockStatus() }}
+        </span>
+      </div>
+
+      <div class="product-price">
+        <span class="price">${{ product.price | number : '1.2-2' }}</span>
+      </div>
+
+      <div class="product-description">
+        <h3>Description</h3>
+        <p>{{ product.desc }}</p>
+      </div>
+
+      <!-- Quantity Selector -->
+      <div class="quantity-selector">
+        <label>Quantity:</label>
+        <div class="quantity-controls">
+          <button (click)="decreaseQuantity()" [disabled]="quantity <= 1">-</button>
+          <input
+            type="number"
+            [(ngModel)]="quantity"
+            name="quantity"
+            min="1"
+            [max]="product.stock"
+            (change)="onQuantityChange()"
+          />
+          <button (click)="increaseQuantity()" [disabled]="quantity >= product.stock">+</button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          class="add-to-cart-btn"
+          (click)="addToCart()"
+          [disabled]="product.stock === 0"
+        >
+          @if(product.stock === 0) {
+            Out of Stock
+          } @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 18C5.9 18 5.01 18.9 5.01 20C5.01 21.1 5.9 22 7 22C8.1 22 9 21.1 9 20C9 18.9 8.1 18 7 18ZM1 2V4H3L6.6 11.59L5.25 14.04C5.09 14.32 5 14.65 5 15C5 16.1 5.9 17 7 17H19V15H7.42C7.28 15 7.17 14.89 7.17 14.75L7.2 14.63L8.1 13H15.55C16.3 13 16.96 12.59 17.3 11.97L20.88 5.48C20.96 5.34 21 5.17 21 5C21 4.45 20.55 4 20 4H5.21L4.27 2H1ZM17 18C15.9 18 15.01 18.9 15.01 20C15.01 21.1 15.9 22 17 22C18.1 22 19 21.1 19 20C19 18.9 18.1 18 17 18Z" fill="white"/>
+            </svg>
+            Add to Cart
+          }
+        </button>
+        <button
+          class="buy-now-btn"
+          (click)="buyNow()"
+          [disabled]="product.stock === 0"
+        >
+          Buy Now
+        </button>
+      </div>
+
+      <!-- Product Details -->
+      <div class="product-details">
+        <h3>Product Details</h3>
+        <ul>
+          <li><strong>Category:</strong> {{ getCategoryName(product.category) }}</li>
+          @if(product.subCategory) {
+          <li><strong>Sub-Category:</strong> {{ getSubCategoryName(product.subCategory) }}</li>
+          }
+          <li><strong>Stock:</strong> {{ product.stock }} items available</li>
+          <li><strong>Added:</strong> {{ product.createdAt | date:'mediumDate' }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  @if(relatedProducts.length > 0) {
+  <div class="related-products">
+    <h2>You May Also Like</h2>
+    <div class="related-products-grid">
+      @for(relatedProduct of relatedProducts; track relatedProduct._id) {
+        @if(relatedProduct._id !== product._id) {
+        <div class="related-product-card">
+          <a [routerLink]="['/products', relatedProduct.slug]">
+            @if(relatedProduct.imgURL) {
+              <img
+                [src]="staticURL + '/' + relatedProduct.imgURL"
+                [alt]="relatedProduct.name"
+                (error)="onImageError($event)"
+              >
+            } @else {
+              <div class="no-image">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="#9CA3AF"/>
+                </svg>
+              </div>
+            }
+          </a>
+          <div class="related-product-info">
+            <h3>
+              <a [routerLink]="['/products', relatedProduct.slug]">{{ relatedProduct.name }}</a>
+            </h3>
+            <p class="price">${{ relatedProduct.price | number:'1.2-2' }}</p>
+            <button
+              class="add-to-cart-btn small"
+              (click)="addToCart(relatedProduct)"
+              [disabled]="relatedProduct.stock === 0"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+        }
+      }
+    </div>
+  </div>
+  }
+</div>
+} @else {
+<div class="loading-container">
+  <div class="spinner"></div>
+  <p>Loading product details...</p>
+</div>
+}

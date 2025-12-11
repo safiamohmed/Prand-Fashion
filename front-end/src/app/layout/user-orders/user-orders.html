@@ -1,0 +1,159 @@
+<div class="user-orders-page">
+  <div class="page-header">
+    <h1 >My Orders</h1>
+    <p>View and manage your orders</p>
+  </div>
+
+  @if(isLoading) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading orders...</p>
+    </div>
+  }
+
+  @if(successMessage) {
+    <div class="success-message">
+      <div class="success-icon">✓</div>
+      <p>{{ successMessage }}</p>
+    </div>
+  }
+
+  @if(errorMessage) {
+    <div class="error-message">
+      <div class="error-icon">⚠️</div>
+      <p>{{ errorMessage }}</p>
+    </div>
+  }
+
+  @if(!isLoading && orders.length === 0) {
+    <div class="empty-orders">
+      <div class="empty-icon">📦</div>
+      <h3>No orders yet</h3>
+      <p>Your orders will appear here once you place them.</p>
+      <a routerLink="/products" class="btn-shop">
+        Start Shopping
+      </a>
+    </div>
+  }
+
+  @if(!isLoading && orders.length > 0) {
+    <div class="orders-container">
+      <!-- نموذج التعديل -->
+      @if(editingOrder) {
+        <div class="edit-modal">
+          <div class="edit-header">
+            <h3>Edit Order #{{ editingOrder._id.slice(-6) }}</h3>
+            <button class="close-btn" (click)="cancelEdit()">×</button>
+          </div>
+
+          <div class="edit-form">
+            <div class="form-group">
+              <label>Address</label>
+              <textarea
+                [(ngModel)]="editData.address"
+                rows="3"
+                placeholder="Enter shipping address"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                [(ngModel)]="editData.phonenumber"
+                placeholder="Enter phone number"
+              >
+            </div>
+
+            <div class="order-preview">
+              <h4>Order Preview</h4>
+              <p><strong>Product:</strong> {{ getProductName(editingOrder) }}</p>
+              <p><strong>Quantity:</strong> {{ editingOrder.quantity }}</p>
+              <p><strong>Total:</strong> ${{ editingOrder.totalPrice }}</p>
+              <p><strong>Status:</strong> {{ getStatusText(editingOrder.status) }}</p>
+            </div>
+
+            <div class="edit-actions">
+              <button type="button" class="btn-cancel" (click)="cancelEdit()">
+                Cancel
+              </button>
+              <button type="button" class="btn-save" (click)="saveEdit()" [disabled]="isLoading">
+                {{ isLoading ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- قائمة الطلبات -->
+      <div class="orders-list">
+        @for(order of orders; track order._id) {
+          <div class="order-card" [class.editing]="editingOrder?._id === order._id">
+            <div class="order-header">
+              <div class="order-info">
+                <h3>Order #{{ order._id.slice(-6) }}</h3>
+                <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+              </div>
+              <div class="order-status">
+                <span class="status-badge {{ getStatusColor(order.status) }}">
+                  {{ getStatusText(order.status) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="order-body">
+              <div class="product-info">
+                <h4>{{ getProductName(order) }}</h4>
+                <p>Quantity: {{ order.quantity }}</p>
+                <p>Price per unit: ${{ order.price }}</p>
+              </div>
+
+              <div class="shipping-info">
+                <h4>Shipping Details</h4>
+                <p><strong>Address:</strong> {{ order.address }}</p>
+                <p><strong>Phone:</strong> {{ order.phonenumber }}</p>
+              </div>
+
+              <div class="order-total">
+                <h4>Total</h4>
+                <p class="total-amount">${{ order.totalPrice }}</p>
+              </div>
+            </div>
+
+            <div class="order-footer">
+              <div class="last-updated">
+                @if(order.lastUpdatedBy) {
+                  <small>
+                    Last updated: {{ formatDate(order.lastUpdatedBy.timestamp) }}
+                  </small>
+                }
+              </div>
+
+              <div class="order-actions">
+                @if(canModify(order)) {
+                  <button
+                    class="btn-edit"
+                    (click)="startEdit(order)"
+                    [disabled]="!!editingOrder"
+                  >
+                    Edit
+                  </button>
+                }
+
+                @if(canCancel(order)) {
+                  <button
+                    class="btn-cancel-order"
+                    (click)="cancelOrder(order)"
+                    [disabled]="isLoading"
+                  >
+                    Cancel Order
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,175 @@
+<!-- pages/cart/cart.html -->
+<div class="cart-page">
+  <div class="page-header">
+    <h1>Shopping Cart</h1>
+    <p>Review your items and proceed to checkout</p>
+  </div>
+
+  @if(isLoading) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading cart...</p>
+    </div>
+  }
+
+  @if(!isLoading && errorMessage) {
+    <div class="error-message">
+      <div class="error-icon">⚠️</div>
+      <p>{{ errorMessage }}</p>
+    </div>
+  }
+
+  @if(!isLoading && !isCheckout) {
+    @if(cart && cart.items && cart.items.length > 0) {
+      <div class="cart-container">
+        <!-- Items List -->
+        <div class="cart-items">
+          @for(item of cart.items; track item.product._id) {
+            <div class="cart-item">
+              <div class="item-image-container">
+                <img
+                  [src]="getImageUrl(item.product.imgURL)"
+                  [alt]="item.product.name"
+                  class="item-image"
+                  (error)="onImageError($event)"
+                />
+              </div>
+
+              <div class="item-details">
+                <h3 class="item-name">{{ item.product.name }}</h3>
+                <p class="item-price">Price: ${{ item.price | number:'1.2-2' }}</p>
+                <p class="item-stock">Available: {{ item.product.stock }}</p>
+              </div>
+
+              <div class="item-quantity">
+                <button (click)="decreaseQuantity(item)" [disabled]="isLoading">-</button>
+                <span class="quantity-number">{{ item.quantity }}</span>
+                <button (click)="increaseQuantity(item)" [disabled]="isLoading">+</button>
+              </div>
+
+              <div class="item-total">
+                <p class="total-price">${{ item.total | number:'1.2-2' }}</p>
+              </div>
+
+              <button class="remove-btn" (click)="removeItem(item.product.name)" [disabled]="isLoading" title="Remove item">
+                ✕
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-summary">
+          <h2>Order Summary</h2>
+
+          <div class="summary-row">
+            <span>Items ({{ getTotalItemsCount() }})</span>
+            <span>${{ cart.cartTotal | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span>Free</span>
+          </div>
+
+          <div class="summary-total">
+            <span>Total</span>
+            <span class="total-amount">${{ cart.cartTotal | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="cart-actions">
+            <button class="btn-clear" (click)="clearCart()" [disabled]="isLoading">
+              Clear Cart
+            </button>
+            <button class="btn-checkout" (click)="proceedToCheckout()" [disabled]="isLoading">
+              Proceed to Checkout
+            </button>
+          </div>
+
+          <a routerLink="/products" class="continue-shopping">
+            ← Continue Shopping
+          </a>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-cart">
+        <div class="empty-cart-icon">
+          🛒
+        </div>
+        <h3>Your cart is empty</h3>
+        <p>Add some items to your cart and they will appear here.</p>
+        <a routerLink="/products" class="btn-shop">
+          Start Shopping
+        </a>
+      </div>
+    }
+  }
+
+  <!-- Checkout Form -->
+  @if(isCheckout) {
+    <div class="checkout-container">
+      <h2>Complete Your Order</h2>
+
+      <form (ngSubmit)="completeOrder()" class="checkout-form" #checkoutForm="ngForm">
+        <div class="form-group">
+          <label for="address">Shipping Address *</label>
+          <textarea
+            id="address"
+            [(ngModel)]="checkoutData.address"
+            name="address"
+            placeholder="Enter your full shipping address (street, city, zip code)"
+            rows="3"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="phonenumber">Phone Number *</label>
+          <input
+            type="tel"
+            id="phonenumber"
+            [(ngModel)]="checkoutData.phonenumber"
+            name="phonenumber"
+            placeholder="Enter your phone number"
+            required
+            pattern="[0-9]{10,15}"
+          >
+          <small class="form-hint">Enter 10-15 digits only</small>
+        </div>
+
+        @if(errorMessage) {
+          <div class="form-error">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <div class="order-review">
+          <h3>Order Review</h3>
+          @if(cart && cart.items) {
+            <div class="review-items">
+              @for(item of cart.items; track item.product._id) {
+                <div class="review-item">
+                  <span>{{ item.quantity }}x {{ item.product.name }}</span>
+                  <span>${{ item.total | number:'1.2-2' }}</span>
+                </div>
+              }
+            </div>
+            <div class="review-total">
+              <span>Total:</span>
+              <span>${{ cart.cartTotal | number:'1.2-2' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="checkout-actions">
+          <button type="button" class="btn-back" (click)="cancelCheckout()" [disabled]="isLoading">
+            Back to Cart
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="isLoading || !checkoutForm.valid">
+            {{ isLoading ? 'Processing...' : 'Place Order' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

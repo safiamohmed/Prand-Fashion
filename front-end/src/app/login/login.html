@@ -1,0 +1,47 @@
+<!-- login.html -->
+<div class="login-container">
+  <div class="login-card">
+    <!-- Header Section -->
+    <div class="login-header">
+      <h1 class="login-title">LOGIN</h1>
+      <p class="login-subtitle">Sign in to your account</p>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
+      <!-- Email Input -->
+      <div class="form-group">
+        <label class="form-label">EMAIL</label>
+        <input
+          formControlName="email"
+          type="text"
+          class="form-input"
+          placeholder="Enter your email">
+      </div>
+
+      <!-- Password Input -->
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input
+          formControlName="password"
+          type="password"
+          class="form-input"
+          placeholder="Enter your password">
+      </div>
+
+      <!-- Login Button -->
+      <button type="submit" class="login-btn">LOGIN</button>
+    </form>
+
+    <!-- Divider -->
+    <div class="divider">
+      <span class="divider-text">OR</span>
+    </div>
+
+   
+    <!-- Sign Up Link -->
+       <div class="signup-link">
+      <p>Don't have an account? <a routerLink="/signup" class="signup-text">Sign up here</a></p>
+    </div>
+  </div>
+</div>

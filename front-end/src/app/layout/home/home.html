@@ -1,0 +1,181 @@
+<!-- home.html -->
+<div class="home-page">
+  <!-- Hero Section -->
+<main class="main-content">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-content">
+        <h1 class="hero-title">Elevate Your Style</h1>
+        <p class="hero-subtitle">Discover the latest fashion trends and exclusive collections</p>
+        <div class="hero-actions">
+          <a routerLink="/products" class="btn-primary">
+            Shop Now
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.025 17L8.025 12L13.025 7L14.425 8.4L10.825 12L14.425 15.6L13.025 17Z" fill="white"/>
+            </svg>
+          </a>
+          <a routerLink="/products" [queryParams]="{category: 'sale'}" class="btn-secondary">
+            View Sale
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">10K+</span>
+            <span class="stat-label">Happy Customers</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">500+</span>
+            <span class="stat-label">Brands</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">24/7</span>
+            <span class="stat-label">Support</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="image-overlay"></div>
+        <!-- يمكنك إضافة صورة هنا -->
+        <div class="hero-image-placeholder">
+          <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="400" rx="20" fill="#8B5CF6"/>
+            <path d="M100 200L150 150L250 250L300 200" stroke="white" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="150" cy="150" r="30" fill="#F59E0B"/>
+            <circle cx="250" cy="250" r="30" fill="#10B981"/>
+            <rect x="120" y="120" width="60" height="60" rx="10" fill="white" fill-opacity="0.2"/>
+            <rect x="220" y="220" width="60" height="60" rx="10" fill="white" fill-opacity="0.2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+
+  <!-- Featured Products Section -->
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured Products</h2>
+        <p class="section-subtitle">Problems trying to resolve the conflict between the two major realms of Classical physics: Newtonian mechanics </p>
+      </div>
+      <div class="products-grid">
+        <!-- Product 1 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="placeholder-image product-placeholder">
+              <span>Product 1</span>
+            </div>
+            <div class="product-overlay">
+              <button class="quick-view">Quick View</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">Graphic Design</h3>
+            <p class="product-category">English Department</p>
+            <div class="product-price">
+              <span class="current-price">$16.48</span>
+              <span class="original-price">$6.48</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="placeholder-image product-placeholder">
+              <span>Product 2</span>
+            </div>
+            <div class="product-overlay">
+              <button class="quick-view">Quick View</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">Graphic Design</h3>
+            <p class="product-category">English Department</p>
+            <div class="product-price">
+              <span class="current-price">$16.48</span>
+              <span class="original-price">$6.48</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="placeholder-image product-placeholder">
+              <span>Product 3</span>
+            </div>
+            <div class="product-overlay">
+              <button class="quick-view">Quick View</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">Graphic Design</h3>
+            <p class="product-category">English Department</p>
+            <div class="product-price">
+              <span class="current-price">$16.48</span>
+              <span class="original-price">$6.48</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="placeholder-image product-placeholder">
+              <span>Product 4</span>
+            </div>
+            <div class="product-overlay">
+              <button class="quick-view">Quick View</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">Graphic Design</h3>
+            <p class="product-category">English Department</p>
+            <div class="product-price">
+              <span class="current-price">$16.48</span>
+              <span class="original-price">$6.48</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- في نهاية الملف home.html -->
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+  <app-feedback></app-feedback>
+
+</section>
+
+  <!-- Services Section -->
+  <section class="services-section">
+    <div class="container">
+      <div class="services-grid">
+        <div class="service-item">
+          <div class="service-icon">🎁</div>
+          <h3 class="service-title">Easy Returns</h3>
+          <p class="service-description">Simply return it within 30 days for an exchange.</p>
+        </div>
+
+        <div class="service-item">
+          <div class="service-icon">🔒</div>
+          <h3 class="service-title">Secure Payment</h3>
+          <p class="service-description">Contactless payment with our app.</p>
+        </div>
+
+        <div class="service-item">
+          <div class="service-icon">💬</div>
+          <h3 class="service-title">24/7 Support</h3>
+          <p class="service-description">Chat with our friendly support team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</div>

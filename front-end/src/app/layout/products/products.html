@@ -1,0 +1,551 @@
+<!-- layout/products/products.html -->
+<div class="products-page">
+  <!-- Hero Section -->
+  <div class="products-hero">
+    <div class="container">
+      <h1 class="hero-title">Discover Amazing Products</h1>
+      <p class="hero-subtitle">Find exactly what you're looking for in our extensive collection</p>
+
+      <!-- Search Bar -->
+      <div class="hero-search">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            placeholder="Search products by name or description..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+          />
+          <button class="search-btn" (click)="onSearch()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z"
+                fill="white"
+              />
+            </svg>
+          </button>
+          @if(searchQuery) {
+          <button class="clear-search-btn" (click)="clearSearch()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
+                fill="#6B7280"
+              />
+            </svg>
+          </button>
+          }
+        </div>
+        <button class="filter-toggle-btn" (click)="toggleFilters()">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4.25 5.61C6.57 8.59 10 13 10 13V19C10 20.1 10.9 21 12 21C13.1 21 14 20.1 14 19V13C14 13 17.43 8.59 19.75 5.61C20.26 4.95 19.79 4 18.95 4H5.04C4.21 4 3.74 4.95 4.25 5.61Z"
+              fill="currentColor"
+            />
+          </svg>
+          {{ showFilters ? 'Hide Filters' : 'Show Filters' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Navigation -->
+  <div class="categories-nav">
+    <div class="container">
+      <div class="nav-inner">
+        <button
+          class="category-btn"
+          [class.active]="!selectedCategory"
+          (click)="selectedCategory = ''; applyFilters()"
+        >
+          All Products
+        </button>
+        @for(category of categories; track category._id) {
+        <button
+          class="category-btn"
+          [class.active]="selectedCategory === category._id"
+          (click)="onCategoryChange(category._id)"
+        >
+          {{ category.name }}
+          <span class="product-count">({{ getProductsByCategory(category._id) }})</span>
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="container main-container">
+    <div class="products-wrapper">
+      <!-- Filters Sidebar (Desktop & Mobile) -->
+      @if(showFilters) {
+      <aside class="filters-sidebar" [class.show]="showFilters">
+        <div class="filters-header">
+          <h3>Filters</h3>
+          <button class="close-filters" (click)="toggleFilters()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Price Range -->
+        <div class="filter-group">
+          <h4 class="filter-title">Price Range</h4>
+          <div class="filter-options">
+            <button
+              class="filter-option"
+              [class.active]="!selectedPriceRange"
+              (click)="selectedPriceRange = ''; applyFilters()"
+            >
+              All Prices
+            </button>
+            <button
+              class="filter-option"
+              [class.active]="selectedPriceRange === '0-50'"
+              (click)="selectedPriceRange = '0-50'; applyFilters()"
+            >
+              $0 - $50
+            </button>
+            <button
+              class="filter-option"
+              [class.active]="selectedPriceRange === '51-100'"
+              (click)="selectedPriceRange = '51-100'; applyFilters()"
+            >
+              $51 - $100
+            </button>
+            <button
+              class="filter-option"
+              [class.active]="selectedPriceRange === '101-200'"
+              (click)="selectedPriceRange = '101-200'; applyFilters()"
+            >
+              $101 - $200
+            </button>
+            <button
+              class="filter-option"
+              [class.active]="selectedPriceRange === '201-500'"
+              (click)="selectedPriceRange = '201-500'; applyFilters()"
+            >
+              $201 - $500
+            </button>
+            <button
+              class="filter-option"
+              [class.active]="selectedPriceRange === '501-'"
+              (click)="selectedPriceRange = '501-'; applyFilters()"
+            >
+              $501 & Above
+            </button>
+          </div>
+        </div>
+
+        <!-- Sub-Categories -->
+        @if(selectedCategory) {
+        <div class="filter-group">
+          <h4 class="filter-title">Sub-Categories</h4>
+          <div class="filter-options">
+            <button
+              class="filter-option"
+              [class.active]="!selectedSubCategory"
+              (click)="selectedSubCategory = ''; applyFilters()"
+            >
+              All Sub-Categories
+            </button>
+            @for(subCat of getParentSubCategories(selectedCategory); track subCat._id) {
+            <button
+              class="filter-option"
+              [class.active]="selectedSubCategory === subCat._id"
+              (click)="onSubCategoryChange(subCat._id)"
+            >
+              {{ subCat.name }}
+              <span class="count">({{ getProductsBySubCategory(subCat._id) }})</span>
+            </button>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- Clear Filters -->
+        @if(selectedCategory || selectedSubCategory || selectedPriceRange || searchQuery) {
+        <div class="filter-group">
+          <button class="clear-all-btn" (click)="clearFilters()">Clear All Filters</button>
+        </div>
+        }
+      </aside>
+      }
+
+      <!-- Main Content -->
+      <main class="products-main">
+        <!-- Toolbar -->
+        <div class="products-toolbar">
+          <div class="results-info">
+            <p>Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ totalProducts }} products</p>
+          </div>
+
+          <div class="toolbar-controls">
+            <!-- View Toggle -->
+            <div class="view-toggle">
+              <button
+                class="view-btn"
+                [class.active]="isGridView"
+                (click)="isGridView = true"
+                title="Grid View"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M4 4H8V8H4V4Z" fill="currentColor" />
+                  <path d="M10 4H14V8H10V4Z" fill="currentColor" />
+                  <path d="M16 4H20V8H16V4Z" fill="currentColor" />
+                  <path d="M4 10H8V14H4V10Z" fill="currentColor" />
+                  <path d="M10 10H14V14H10V10Z" fill="currentColor" />
+                  <path d="M16 10H20V14H16V10Z" fill="currentColor" />
+                  <path d="M4 16H8V20H4V16Z" fill="currentColor" />
+                  <path d="M10 16H14V20H10V16Z" fill="currentColor" />
+                  <path d="M16 16H20V20H16V16Z" fill="currentColor" />
+                </svg>
+              </button>
+              <button
+                class="view-btn"
+                [class.active]="!isGridView"
+                (click)="isGridView = false"
+                title="List View"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M3 18H21V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="currentColor" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="sort-dropdown">
+              <label for="sortSelect">Sort by:</label>
+              <select id="sortSelect" [(ngModel)]="sortBy" (change)="onSortChange(sortBy)">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
+                <option value="name-desc">Name: Z to A</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        @if(isLoading) {
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <p>Loading products...</p>
+        </div>
+        }
+
+        <!-- Products Content -->
+        @if(!isLoading) { @if(filteredProducts.length > 0) {
+        <!-- Products Grid/List -->
+        @if(isGridView) {
+        <div class="products-grid">
+          @for(product of getPaginatedProducts(); track product._id) {
+          <div class="product-card">
+            <div class="card-image">
+              <a [routerLink]="['/products', product.slug]">
+                @if(product.imgURL) {
+                <img [src]="staticURL + '/' + product.imgURL" [alt]="product.name" loading="lazy" />
+                } @else {
+                <div class="no-image">
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z"
+                      fill="#9CA3AF"
+                    />
+                  </svg>
+                </div>
+                }
+              </a>
+              <button class="wishlist-btn" title="Add to wishlist">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+              @if(product.stock < 10 && product.stock > 0) {
+              <span class="stock-badge low-stock">Low Stock</span>
+              } @if(product.stock === 0) {
+              <span class="stock-badge out-of-stock">Out of Stock</span>
+              }
+            </div>
+
+            <div class="card-content">
+              <div class="category-badge">
+                {{ getCategoryName(product.category) }}
+              </div>
+
+              <h3 class="product-title">
+                <a [routerLink]="['/products', product.slug]">{{ product.name }}</a>
+              </h3>
+
+              <p class="product-description">{{ (product.desc || '').slice(0, 80) }}...</p>
+
+              <div class="product-price">
+                <span class="price">${{ product.price | number : '1.2-2' }}</span>
+              </div>
+
+              <div class="card-actions">
+                <button
+                  class="add-to-cart-btn"
+                  (click)="addToCart(product)"
+                  [disabled]="product.stock === 0"
+                >
+                  @if(product.stock === 0) { Out of Stock } @else {
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7 18C5.9 18 5.01 18.9 5.01 20C5.01 21.1 5.9 22 7 22C8.1 22 9 21.1 9 20C9 18.9 8.1 18 7 18ZM1 2V4H3L6.6 11.59L5.25 14.04C5.09 14.32 5 14.65 5 15C5 16.1 5.9 17 7 17H19V15H7.42C7.28 15 7.17 14.89 7.17 14.75L7.2 14.63L8.1 13H15.55C16.3 13 16.96 12.59 17.3 11.97L20.88 5.48C20.96 5.34 21 5.17 21 5C21 4.45 20.55 4 20 4H5.21L4.27 2H1ZM17 18C15.9 18 15.01 18.9 15.01 20C15.01 21.1 15.9 22 17 22C18.1 22 19 21.1 19 20C19 18.9 18.1 18 17 18Z"
+                      fill="white"
+                    />
+                  </svg>
+                  Add to Cart }
+                </button>
+                <a [routerLink]="['/products', product.slug]" class="view-details-btn">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        } @else {
+        <!-- List View -->
+        <div class="products-list">
+          @for(product of getPaginatedProducts(); track product._id) {
+          <div class="product-list-item">
+            <div class="list-item-image">
+              <a [routerLink]="['/products', product.slug]">
+                @if(product.imgURL) {
+                <img [src]="staticURL + '/' + product.imgURL" [alt]="product.name" loading="lazy" />
+                } @else {
+                <div class="no-image">
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z"
+                      fill="#9CA3AF"
+                    />
+                  </svg>
+                </div>
+                }
+              </a>
+            </div>
+
+            <div class="list-item-content">
+              <div class="list-item-header">
+                <h3 class="list-item-title">
+                  <a [routerLink]="['/products', product.slug]">{{ product.name }}</a>
+                </h3>
+                <div class="list-item-price">${{ product.price | number : '1.2-2' }}</div>
+              </div>
+
+              <div class="list-item-category">
+                <span class="category">{{ getCategoryName(product.category) }}</span>
+                @if(product.subCategory) {
+                <span class="subcategory">• {{ getSubCategoryName(product.subCategory) }}</span>
+                }
+              </div>
+
+              <p class="list-item-description">{{ product.desc }}</p>
+
+              <div class="list-item-stock">
+                <span
+                  [class]="
+                    product.stock === 0
+                      ? 'out-of-stock'
+                      : product.stock < 10
+                      ? 'low-stock'
+                      : 'in-stock'
+                  "
+                >
+                  {{
+                    product.stock === 0
+                      ? 'Out of Stock'
+                      : product.stock < 10
+                      ? 'Low Stock'
+                      : 'In Stock'
+                  }}
+                </span>
+                • {{ product.stock }} items available
+              </div>
+
+              <div class="list-item-actions">
+                <button
+                  class="add-to-cart-btn"
+                  (click)="addToCart(product)"
+                  [disabled]="product.stock === 0"
+                >
+                  @if(product.stock === 0) { Out of Stock } @else { Add to Cart }
+                </button>
+                <a [routerLink]="['/products', product.slug]" class="view-details-btn">
+                  View Details
+                </a>
+                <button class="wishlist-btn" title="Add to wishlist">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Pagination -->
+        @if(totalPages > 1) {
+        <div class="pagination">
+          <button
+            class="pagination-btn prev-btn"
+            [disabled]="currentPage === 1"
+            (click)="previousPage()"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15.41 16.59L10.83 12L15.41 7.41L14 6L8 12L14 18L15.41 16.59Z"
+                fill="currentColor"
+              />
+            </svg>
+            Previous
+          </button>
+
+          <div class="pagination-numbers">
+            @for(page of getPageNumbers(); track page) { @if(page === '...') {
+            <span class="pagination-dots">...</span>
+            } @else {
+            <button
+              class="pagination-number"
+              [class.active]="currentPage === page"
+              (click)="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+            } }
+          </div>
+
+          <button
+            class="pagination-btn next-btn"
+            [disabled]="currentPage === totalPages"
+            (click)="nextPage()"
+          >
+            Next
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+        </div>
+        } } @else {
+        <!-- No Results -->
+        <div class="no-results">
+          <div class="no-results-icon">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5ZM2 18L10 18V20H2V18Z"
+                fill="#9CA3AF"
+              />
+            </svg>
+          </div>
+          <h3>No products found</h3>
+          <p>Try adjusting your search or filter criteria to find what you're looking for.</p>
+          @if(selectedCategory || selectedSubCategory || selectedPriceRange || searchQuery) {
+          <button class="btn-primary" (click)="clearFilters()">Clear All Filters</button>
+          }
+        </div>
+        } }
+      </main>
+    </div>
+  </div>
+</div>

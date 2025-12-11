@@ -1,0 +1,190 @@
+<div class="testimonial-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">What Our Customers Say</h2>
+      <p class="section-subtitle">Real experiences from real customers</p>
+    </div>
+
+    <!-- Testimonial Slider -->
+    <div class="testimonial-slider">
+      @if(isLoading) {
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading testimonials...</p>
+        </div>
+      }
+
+      @if(!isLoading && errorMessage) {
+        <div class="error-message">
+          <span class="error-icon">⚠️</span>
+          <p>{{ errorMessage }}</p>
+          <button (click)="loadTestimonials()" class="btn-retry">Retry</button>
+        </div>
+      }
+
+      @if(!isLoading && testimonials.length > 0) {
+        <div class="slider-container">
+          <!-- Testimonial Cards -->
+          <div class="slider-track" [style.transform]="'translateX(-' + (currentIndex * 100) + '%)'">
+            @for(testimonial of testimonials; track testimonial._id; let i = $index) {
+              <div class="testimonial-card" [class.active]="i === currentIndex">
+                <div class="testimonial-content">
+                  <div class="user-info">
+                    @if(testimonial.user.avatar) {
+                      <img
+                        [src]="testimonial.user.avatar"
+                        [alt]="testimonial.user.name"
+                        class="user-avatar"
+                      />
+                    } @else {
+                      <div class="avatar-placeholder">
+                        {{ testimonial.user.name.charAt(0) }}
+                      </div>
+                    }
+                    <div class="user-details">
+                      <h4 class="user-name">{{ testimonial.user.name }}</h4>
+                      <div class="user-rating">
+                        @for(star of getStars(testimonial.rating); track $index) {
+                          <span class="star">{{ star }}</span>
+                        }
+                        <span class="rating-number">({{ testimonial.rating }}/5)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="testimonial-text">
+                    <p>"{{ testimonial.comment }}"</p>
+                  </div>
+
+                  <div class="testimonial-meta">
+                    <span class="date">{{ formatDate(testimonial.createdAt) }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Slider Controls -->
+          <div class="slider-controls">
+            <button (click)="prevSlide()" class="control-btn prev">
+              ←
+            </button>
+
+            <!-- Indicators -->
+            <div class="slider-indicators">
+              @for(testimonial of testimonials; track testimonial._id; let i = $index) {
+                <button
+                  (click)="goToSlide(i)"
+                  [class.active]="i === currentIndex"
+                  class="indicator"
+                  [attr.aria-label]="'Go to testimonial ' + (i + 1)"
+                ></button>
+              }
+            </div>
+
+            <button (click)="nextSlide()" class="control-btn next">
+              →
+            </button>
+          </div>
+        </div>
+      }
+
+      @if(!isLoading && testimonials.length === 0) {
+        <div class="no-testimonials">
+          <div class="empty-icon">💬</div>
+          <h3>No testimonials yet</h3>
+          <p>Be the first to share your experience!</p>
+        </div>
+      }
+    </div>
+
+    <!-- Add Testimonial Button -->
+    <div class="add-testimonial-section">
+      <button
+        (click)="openTestimonialForm()"
+        class="btn-add-testimonial"
+        *ngIf="!showForm"
+      >
+        <span class="btn-icon">✍️</span>
+        Share Your Experience
+      </button>
+
+      <!-- Testimonial Form -->
+      @if(showForm) {
+        <div class="testimonial-form-container">
+          <div class="form-header">
+            <h3>Share Your Experience</h3>
+            <button (click)="closeTestimonialForm()" class="close-btn">×</button>
+          </div>
+
+          <form (ngSubmit)="submitTestimonial()" #testimonialForm="ngForm">
+            <div class="form-group">
+              <label>Your Rating</label>
+              <div class="rating-stars">
+                @for(i of [1,2,3,4,5]; track i) {
+                  <button
+                    type="button"
+                    (click)="setRating(i)"
+                    [class.active]="newTestimonial.rating >= i"
+                    class="star-btn"
+                  >
+                    ★
+                  </button>
+                }
+                <span class="rating-text">
+                  {{ newTestimonial.rating }} out of 5 stars
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="comment">Your Experience</label>
+              <textarea
+                id="comment"
+                [(ngModel)]="newTestimonial.comment"
+                name="comment"
+                placeholder="Tell us about your experience with our website..."
+                rows="4"
+                required
+                minlength="10"
+                maxlength="500"
+                class="form-textarea"
+              ></textarea>
+              <div class="char-count">
+                {{ newTestimonial.comment.length }}/500 characters
+              </div>
+            </div>
+
+            @if(errorMessage) {
+              <div class="form-error">
+                {{ errorMessage }}
+              </div>
+            }
+
+            <div class="form-actions">
+              <button
+                type="button"
+                (click)="closeTestimonialForm()"
+                class="btn-cancel"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                [disabled]="isLoading || !testimonialForm.valid"
+                class="btn-submit"
+              >
+                @if(isLoading) {
+                  <span class="spinner-small"></span>
+                  Submitting...
+                } @else {
+                  Submit Testimonial
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  </div>
+</div>
